@@ -1,44 +1,33 @@
 $("#other-title").hide();
 
-// $("#design").change(function() {
-//     let $design = $(this).val();
+let designSelect = document.getElementById("design");
+let colorSelect = document.getElementById("color");
 
-//     console.log($design);
+let options = {
+  "js puns": [
+    {value: "cornflowerblue", text: "Cornflower Blue (JS Puns shirt only)"},
+    {value: "darkslategrey", text: "Dark Slate Grey (JS Puns shirt only)"},
+    {value: "gold", text: "Gold (JS Puns shirt only)"}
+  ],
+  "heart js": [
+    {value: "tomato", text: "Tomato (I &#9829; JS shirt only)"},
+    {value: "steelblue", text: "Steel Blue (I &#9829; JS shirt only)"},
+    {value: "dimgrey", text: "Dim Grey (I &#9829; JS shirt only)"}
+  ]
+};
 
-//     if ($design == "js puns") {
-//         $("#colors-js-puns").show();
-//         //hide all the other options
-//         $("#color option").not(":contains('JS Puns')").hide();
-//     } else if ($design == "heart js") {
-//         $("#colors-js-puns").show();
-//         $("#color option:contains('I <3 JS')").show();
-//         //hide all the other options
-//         $("#color option").not(":contains('I <3 JS')").hide();
-//     } else {
-//         $("#colors-js-puns").hide();
-//     }
-// });
+designSelect.addEventListener("change", function() {
+  let optionsHTML = "";
+  if (designSelect.value === "Select Theme") {
+    optionsHTML = `<option>Select Color</option>`;
+  } else {
+    options[designSelect.value].forEach(function(opt) {
+      optionsHTML += `<option value="${opt.value}">${opt.text}</option>`;
+    });
+  }
+  colorSelect.innerHTML = optionsHTML;
+});
 
-document.getElementById("design").addEventListener("change", function() {
-    var colorSelect = document.getElementById("color");
-    var selectedDesign = this.value;
-  
-    // Hide all options
-    for (var i = 0; i < colorSelect.options.length; i++) {
-      colorSelect.options[i].style.display = "none";
-    }
-  
-    // Show options for selected theme
-    if (selectedDesign == "js puns") {
-      for (var i = 1; i < 4; i++) {
-        colorSelect.options[i].style.display = "block";
-      }
-    } else if (selectedDesign == "heart js") {
-      for (var i = 4; i < colorSelect.options.length; i++) {
-        colorSelect.options[i].style.display = "block";
-      }
-    }
-  });
   
   
   
