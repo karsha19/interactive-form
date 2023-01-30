@@ -3,8 +3,8 @@ $("#other-title").hide();
 
 // function for updating design section
 function selectDesign () {
-  let design = $("#design");
-  let color = $("#color");
+  let $design = $("#design");
+  let $color = $("#color");
 
   // object structure with theme name as keys, and array of objects as values
   let options = {
@@ -20,16 +20,16 @@ function selectDesign () {
     ]
   };
 
-  design.change(function() {
+  $design.change(function() {
     let optionsHTML = "";
-    if (design.val() === "Select Theme") {
+    if ($design.val() === "Select Theme") {
       optionsHTML = `<option>Select Color</option>`;
     } else {
-      options[design.val()].forEach(function(opt) {
+      options[$design.val()].forEach(function(opt) {
         optionsHTML += `<option value="${opt.value}">${opt.text}</option>`;
       });
     }
-    color.html(optionsHTML);
+    $color.html(optionsHTML);
   });
 }
 
@@ -48,5 +48,17 @@ function selectActivity() {
     "node": { "name": "JavaScript Libraries Workshop", "time": "Tuesday 13:00 - 16:00", "cost": 100 }
   };
 
+  // wrtie a loop to construct the conflicting slots
+  console.log($activities.outerText);
+
+
+  $activities.change(function() {
+    let $selectedCheckBox = $('input[type="checkbox"]:checked');
+    if ($selectedCheckBox.length) {
+      //console.log($selectedCheckBox.closest("label").text());
+    }
+  });
 
 }
+
+selectActivity();
