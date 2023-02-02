@@ -36,29 +36,50 @@ function selectDesign () {
 
 selectDesign();
 
-function selectActivity() {
-  let $activities = $(".activities");
-  let totalDisplay = $("p");
-  let totalCost = 0;
 
-  let conflictingTimeSlots = {
-    "js-frameworks": { "name": "Express Workshop", "time": "Tuesday 9:00 - 12:00", "cost": 100 },
-    "express": { "name": "JavaScript Frameworks Workshop", "time": "Tuesday 9:00 - 12:00", "cost": 100 },
-    "js-libs": { "name": "Node.js Workshop", "time": "Tuesday 13:00 - 16:00", "cost": 100 },
-    "node": { "name": "JavaScript Libraries Workshop", "time": "Tuesday 13:00 - 16:00", "cost": 100 }
+/* 
+
+ <fieldset class="activities">
+    <legend>Register for Activities</legend>
+    <label><input type="checkbox" name="all"> Main Conference — $200</label>
+    <label><input type="checkbox" name="js-frameworks"> JavaScript Frameworks Workshop — Tuesday 9:00 - 12:00, $100</label>
+    <label><input type="checkbox" name="js-libs"> JavaScript Libraries Workshop — Tuesday 13:00 - 16:00, $100</label>
+    <label><input type="checkbox" name="express"> Express Workshop — Tuesday 9:00 - 12:00, $100</label>
+    <label><input type="checkbox" name="node"> Node.js Workshop — Tuesday 13:00 - 16:00, $100</label>          
+    <label><input type="checkbox" name="build-tools"> Build tools Workshop — Wednesday 9:00 - 12:00, $100</label>
+    <label><input type="checkbox" name="npm"> npm Workshop — Wednesday 13:00 - 16:00, $100</label>    	
+  </fieldset>
+  
+*/
+
+// function to parse each label and retrun an object with name, time, cost and weekday.
+function getEventInfo($label) {
+  let $input = $label.find("input");
+  let name = $input.attr("name");
+  let time = $label.text().match(/(\d{1,2}:\d{2})/g);
+  let cost = $label.text().match(/\$(\d{3})/g);
+  let weekday = $label.text().match(/(Monday|Tuesday|Wednesday|Thursday|Friday)/g);
+  return {
+    name: name,
+    time: time,
+    cost: cost,
+    weekday: weekday
   };
-
-  // wrtie a loop to construct the conflicting slots
-  console.log($activities.outerText);
-
-
-  $activities.change(function() {
-    let $selectedCheckBox = $('input[type="checkbox"]:checked');
-    if ($selectedCheckBox.length) {
-      //console.log($selectedCheckBox.closest("label").text());
-    }
-  });
-
 }
 
-selectActivity();
+// function to extract name, time, cost and weekday from all labels and store in an array.
+function getEvents() {
+  let $labels = $(".activities label");
+  let events = [];
+  $labels.each(function() {
+    events.push(getEventInfo($(this)));
+  });
+  return events;
+}
+
+console.log(getEvents());
+
+// function to disable conflicting events
+function disableConflicts() {
+  
+}
