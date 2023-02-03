@@ -58,7 +58,7 @@ function getEventInfo($label) {
   let name = $input.attr("name");
   let time = $label.text().match(/(\d{1,2}:\d{2})/g);
   let cost = $label.text().match(/\$(\d{3})/g);
-  let weekday = $label.text().match(/(Monday|Tuesday|Wednesday|Thursday|Friday)/g);
+  let weekday = $label.text().match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/g);
   return {
     name: name,
     time: time,
@@ -67,7 +67,7 @@ function getEventInfo($label) {
   };
 }
 
-// function to extract name, time, cost and weekday from all labels and store in an array.
+// function to extract names, times, costs and weekdays from all labels and store in an array.
 function getEvents() {
   let $labels = $(".activities label");
   let events = [];
@@ -79,7 +79,34 @@ function getEvents() {
 
 console.log(getEvents());
 
-// function to disable conflicting events
-function disableConflicts() {
+// function to disable competing labels if they have overlap with selected label.
+function disableOverlap($selectedLabel, $labels) {
   
+  for (lab of $labels) {
+    console.log(lab.name + " " + lab.weekday);
+    let event = getEventInfo(lab);
+    let selectedEvent = getEventInfo($selectedLabel);
+
+    if (event.name != selectedEvent.name && event.weekday == selectedEvent.weekday) {
+      lab.find("input").attr("disabled", true);
+      console.log(lab.name + " and " + selectedEvent.name + " have overlap");
+    }
+  }
 }
+
+// function to notice changes in the activities when user selects or deselects an event.
+function selectActivities() {
+  let $activities = $(".activities");
+  let $labels = $(".activities label");
+  
+  $activities.change(function(e) {
+    let $label = $(e.target).parent();
+    if ($(e.target).is(":checked")) {
+      disableOverlap($label, $labels);
+    } else {
+      $label.find("input").attr("disabled", false);
+    }
+  });
+}
+
+selectActivities();
