@@ -33,38 +33,40 @@ function selectDesign () {
   });
 }
 
-
 selectDesign();
 
-
-/* 
-
- <fieldset class="activities">
-    <legend>Register for Activities</legend>
-    <label><input type="checkbox" name="all"> Main Conference — $200</label>
-    <label><input type="checkbox" name="js-frameworks"> JavaScript Frameworks Workshop — Tuesday 9:00 - 12:00, $100</label>
-    <label><input type="checkbox" name="js-libs"> JavaScript Libraries Workshop — Tuesday 13:00 - 16:00, $100</label>
-    <label><input type="checkbox" name="express"> Express Workshop — Tuesday 9:00 - 12:00, $100</label>
-    <label><input type="checkbox" name="node"> Node.js Workshop — Tuesday 13:00 - 16:00, $100</label>          
-    <label><input type="checkbox" name="build-tools"> Build tools Workshop — Wednesday 9:00 - 12:00, $100</label>
-    <label><input type="checkbox" name="npm"> npm Workshop — Wednesday 13:00 - 16:00, $100</label>    	
-  </fieldset>
-  
-*/
-
 // function to parse each label and retrun an object with name, time, cost and weekday.
-function getEventInfo($label) {
-  let $input = $label.find("input");
-  let name = $input.attr("name");
-  let time = $label.text().match(/(\d{1,2}:\d{2})/g);
-  let cost = $label.text().match(/\$(\d{3})/g);
-  let weekday = $label.text().match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/g);
+function getEventInfo(label) {
+  let $input = $(label).find("input");
+  let $name = $input.attr("name");
+  let $time = $(label).text().match(/(\d{1,2}:\d{2})/g);
+  let $cost = $(label).text().match(/\$(\d{3})/g);
+  let $weekday = $(label).text().match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/g);
   return {
-    name: name,
-    time: time,
-    cost: cost,
-    weekday: weekday
+    name: $name,
+    time: $time,
+    cost: $cost,
+    weekday: $weekday
   };
+}
+
+// variable to keep track of total cost for selected events.
+let totalCost = 0;
+
+// helper function to check if the parameter is not null, 
+// and access the first element of the array.
+function getFirstElement(array) {
+  if (array) {
+    return array[0];
+  }
+}
+
+// helper function to check if the parameter is not null,
+// then access the last element of the array.
+function getLastElement(array) {
+  if (array) {
+    return array[array.length - 1];
+  }
 }
 
 // function to extract names, times, costs and weekdays from all labels and store in an array.
@@ -80,32 +82,52 @@ function getEvents() {
 console.log(getEvents());
 
 // function to disable competing labels if they have overlap with selected label.
-function disableOverlap($selectedLabel, $labels) {
+function disableOverlap(selectedLabel, labels) {
+  let selectedEvent = getEventInfo(selectedLabel);
   
-  for (lab of $labels) {
-    console.log(lab.name + " " + lab.weekday);
+  for (lab of labels) {
     let event = getEventInfo(lab);
-    let selectedEvent = getEventInfo($selectedLabel);
-
-    if (event.name != selectedEvent.name && event.weekday == selectedEvent.weekday) {
-      lab.find("input").attr("disabled", true);
-      console.log(lab.name + " and " + selectedEvent.name + " have overlap");
+  
+    if ( getFirstElement(event.weekday) == getFirstElement(selectedEvent.weekday) &&
+         getFirstElement(event.time) == getFirstElement(selectedEvent.time) &&
+         getLastElement(event.time) == getLastElement(selectedEvent.time) &&
+         event.name != selectedEvent.name) {
+      $(lab).find("input").attr("disabled", true);
+      console.log(event.name + " and " + selectedEvent.name + " have overlap");
     }
   }
 }
 
+
+// function to update total cost of selected events.
+function updateTotalCost(numercialCost) {
+  let $labels = $(".activities label");
+  $labels.each(function() {
+    let $input = $(this).find("input");
+    if ($input.is(":checked")) {
+      totalCost += numercialCost;
+    }
+  });
+  $(".activities").append(`<p>Total Cost: $ ${totalCost} </p>`);
+}
+
+
 // function to notice changes in the activities when user selects or deselects an event.
 function selectActivities() {
-  let $activities = $(".activities");
   let $labels = $(".activities label");
-  
-  $activities.change(function(e) {
-    let $label = $(e.target).parent();
-    if ($(e.target).is(":checked")) {
-      disableOverlap($label, $labels);
+  $labels.change(function() {
+    let $selectedLabel = $(this);
+    let costString = getFirstElement(getEventInfo($selectedLabel).cost).replace("$", "");
+    let numercialCost = parseInt(costString);
+    
+    if ($selectedLabel.find("input").is(":checked")) {
+      console.log("we are in select activity and is checked " + numercialCost);
+      disableOverlap($selectedLabel, $labels);
+      updateTotalCost(numercialCost);
     } else {
-      $label.find("input").attr("disabled", false);
+      $labels.find("input").attr("disabled", false);
     }
+    
   });
 }
 
