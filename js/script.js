@@ -50,19 +50,15 @@ function getEventInfo(label) {
   };
 }
 
-// variable to keep track of total cost for selected events.
-let totalCost = 0;
 
-// helper function to check if the parameter is not null, 
-// and access the first element of the array.
+// helper function to access the first element of the array.
 function getFirstElement(array) {
   if (array) {
     return array[0];
   }
 }
 
-// helper function to check if the parameter is not null,
-// then access the last element of the array.
+// helper function to access the last element of the array.
 function getLastElement(array) {
   if (array) {
     return array[array.length - 1];
@@ -93,22 +89,25 @@ function disableOverlap(selectedLabel, labels) {
          getLastElement(event.time) == getLastElement(selectedEvent.time) &&
          event.name != selectedEvent.name) {
       $(lab).find("input").attr("disabled", true);
-      console.log(event.name + " and " + selectedEvent.name + " have overlap");
     }
   }
 }
 
+$(".activities").append(`<p class="total-cost">Total Cost: $ 0 </p>`);
 
-// function to update total cost of selected events.
-function updateTotalCost(numercialCost) {
+// function to update total cost for selected events.
+function updateTotalCost() {
   let $labels = $(".activities label");
+  let totalCost = 0;
   $labels.each(function() {
     let $input = $(this).find("input");
     if ($input.is(":checked")) {
+      let costString = getFirstElement(getEventInfo($input.parent()).cost).replace("$", "");
+      let numercialCost = parseInt(costString);
       totalCost += numercialCost;
     }
   });
-  $(".activities").append(`<p>Total Cost: $ ${totalCost} </p>`);
+  $(".total-cost").text(`Total Cost: $ ${totalCost}`);
 }
 
 
@@ -117,18 +116,43 @@ function selectActivities() {
   let $labels = $(".activities label");
   $labels.change(function() {
     let $selectedLabel = $(this);
-    let costString = getFirstElement(getEventInfo($selectedLabel).cost).replace("$", "");
-    let numercialCost = parseInt(costString);
     
     if ($selectedLabel.find("input").is(":checked")) {
-      console.log("we are in select activity and is checked " + numercialCost);
       disableOverlap($selectedLabel, $labels);
-      updateTotalCost(numercialCost);
     } else {
       $labels.find("input").attr("disabled", false);
     }
-    
+    updateTotalCost();
   });
 }
 
 selectActivities();
+
+// function to update the payment info section based on user selection. 
+
+function updatePaymentInfo() {
+  let $paymentMethod = $("#payment");
+  let $creditCard = $("#credit-card");
+  let $paypal = $("#credit-card").next();
+  let $bitcoin = $paypal.next();
+  
+  $paymentMethod.change(function() {
+    let paymentMethod = $(this).val();
+    
+    if (paymentMethod == "credit card") {
+      $creditCard.show();
+      $paypal.hide();
+      $bitcoin.hide();
+    } else if (paymentMethod == "paypal") {
+      $creditCard.hide();
+      $paypal.show();
+      $bitcoin.hide();
+    } else if (paymentMethod == "bitcoin") {
+      $creditCard.hide();
+      $paypal.hide();
+      $bitcoin.show();
+    }
+  });
+}
+
+updatePaymentInfo();
