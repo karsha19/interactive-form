@@ -1,4 +1,25 @@
-$("#other-title").hide();
+// function to focus on page load, the cursor appears in the "Name" field, ready for a user to type.
+function focusName() {
+  $("#name").focus();
+}
+
+// function to hide the other job role text field by default.
+function hideOtherJobRole() {
+  $("#other-title").hide();
+}
+
+// function to update the job role section based on user selection.
+function selectJobRole() {
+  let $title = $("#title");
+  let $otherTitle = $("#other-title");
+  $title.change(function() {
+    if ($(this).val() === "other") {
+      $otherTitle.show();
+    } else {
+      $otherTitle.hide();
+    }
+  });
+}
 
 
 // function for updating design section
@@ -33,7 +54,6 @@ function selectDesign () {
   });
 }
 
-selectDesign();
 
 // function to parse each label and retrun an object with name, time, cost and weekday.
 function getEventInfo(label) {
@@ -75,7 +95,6 @@ function getEvents() {
   return events;
 }
 
-console.log(getEvents());
 
 // function to disable competing labels if they have overlap with selected label.
 function disableOverlap(selectedLabel, labels) {
@@ -93,7 +112,11 @@ function disableOverlap(selectedLabel, labels) {
   }
 }
 
-$(".activities").append(`<p class="total-cost">Total Cost: $ 0 </p>`);
+// function to append total cost to the activities section.
+function appendTotalCost() {
+  $(".activities").append(`<p class="total-cost">Total Cost: $ 0 </p>`);
+}
+
 
 // function to update total cost for selected events.
 function updateTotalCost() {
@@ -126,10 +149,8 @@ function selectActivities() {
   });
 }
 
-selectActivities();
 
 // function to update the payment info section based on user selection. 
-
 function updatePaymentInfo() {
   let $paymentMethod = $("#payment");
   let $creditCard = $("#credit-card");
@@ -155,4 +176,111 @@ function updatePaymentInfo() {
   });
 }
 
-updatePaymentInfo();
+
+// function to validate name field. Name field can't be blank.
+function validateName() {
+  let $name = $("#name");
+  let name = $name.val();
+  if (name == "") {
+    alert("Name field can't be blank");
+    return false;
+  }
+  return true;
+}
+
+// function to validate email field. Email field must be in the format of email address.
+// Email field must be a validly formatted e-mail address.
+function validateEmail() {
+  let $email = $("#mail");
+  let email = $email.val();
+  let emailRegex = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+  if (!emailRegex.test(email)) {
+    alert("Email filed can't be blank and must be a valid format");
+    return false;
+  }
+  return true;
+}
+
+// function to validate activities field. At least one activity must be selected.
+function validateActivities() {
+  let $activities = $(".activities input");
+  let activities = $activities.toArray();
+  let checked = activities.filter(function(activity) {
+    return $(activity).is(":checked");
+  });
+  if (checked.length == 0) {
+    alert("At least one activity must be selected");
+    return false;
+  }
+  return true;
+}
+
+
+/* 
+  function to validate credit card field.
+  If the selected payment option is "Credit Card." make sure the user has supplied a
+  Credit Card number, a Zip Code, and a 3 number CVV value before the form can be
+  submitted. if selected payment option is not "Credit Card", then no validation is needed.
+*/
+
+function validateCreditCard() {
+  let $paymentMethod = $("#payment");
+  let $creditCard = $("#credit-card");
+  let $paypal = $("#credit-card").next();
+  let $bitcoin = $paypal.next();
+  
+  let $ccNum = $("#cc-num");
+  let $zip = $("#zip");
+  let $cvv = $("#cvv");
+  
+  let ccNum = $ccNum.val();
+  let zip = $zip.val();
+  let cvv = $cvv.val();
+  
+  let ccNumRegex = /^\d{13,16}$/;
+  let zipRegex = /^\d{5}$/;
+  let cvvRegex = /^\d{3}$/;
+  
+  if ($paymentMethod.val() == "credit card") {
+    if (!ccNumRegex.test(ccNum)) {
+      alert("Credit card number must be between 13 and 16 digits");
+      return false;
+    }
+    if (!zipRegex.test(zip)) {
+      alert("Zip code must be 5 digits");
+      return false;
+    }
+    if (!cvvRegex.test(cvv)) {
+      alert("CVV must be 3 digits");
+      return false;
+    }
+  }
+  return true;
+}
+
+
+// function to add functionality to register button.
+function register() {
+  let $register = $("button[type='submit']");
+  $register.click(function() {
+    validateName();
+    validateEmail();
+    validateActivities();
+    validateCreditCard();
+  });
+}
+
+
+// main function to call all the necessary functions.
+function main() {
+  focusName();
+  hideOtherJobRole();
+  selectJobRole();
+  selectDesign();
+  appendTotalCost();
+  selectActivities();
+  updatePaymentInfo();
+  register();
+}
+
+main();
